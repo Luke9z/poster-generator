@@ -1,4 +1,40 @@
-<!DOCTYPE html>
+const posY = document.getElementById('posYRange').value;
+                
+                // 计算图片绘制参数
+                const imgWidth = img.width * scale;
+                const imgHeight = img.height * scale;
+                const x = (canvas.width - imgWidth) / 2 + (posX * canvas.width / 100);
+                const y = (canvas.height - imgHeight) / 2 + (posY * canvas.height / 100);
+                
+                // 绘制图片到画布
+                ctx.drawImage(img, x, y, imgWidth, imgHeight);
+                
+                // 获取裁剪后的图片数据
+                customImageData = canvas.toDataURL('image/png');
+                
+                // 更新预览
+                document.getElementById('previewImage').src = customImageData;
+                
+                // 关闭模态框
+                closeCropModal();
+            };
+            img.src = customImageData;
+        }
+
+        // 关闭裁剪模态框
+        function closeCropModal() {
+            const cropModal = document.getElementById('cropModal');
+            cropModal.classList.remove('show');
+        }
+
+        // 点击模态框外部关闭
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('cropModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCropModal();
+                }
+            });
+        });<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -31,6 +67,7 @@
             align-items: center;
             padding: 20px;
             position: relative;
+            overflow-x: hidden;
         }
 
         /* 背景动画 */
@@ -377,25 +414,35 @@
 
         .poster-name {
             font-size: 32px;
-            font-weight: 700;
-            margin: 20px 0;
+            font-weight: 600;
+            margin: 10px 0;
             text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
             color: #ffffff;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            letter-spacing: 2px;
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            letter-spacing: 1px;
             position: relative;
             z-index: 10;
         }
 
         .poster-host {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 500;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
             color: rgba(255,255,255,0.9);
-            font-family: 'Georgia', 'Times New Roman', serif;
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
             position: relative;
             z-index: 10;
+        }
+
+        .poster-date {
+            font-size: 11px;
+            margin-top: 15px;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
 
         .poster-subtitle {
@@ -517,6 +564,202 @@
             transform: translateX(0);
         }
 
+        /* 图片上传样式 */
+        .image-upload-area {
+            border: 2px dashed #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            opacity: 0.6;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .image-preview {
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .image-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .crop-btn, .remove-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crop-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .crop-btn:hover {
+            background: #5a67d8;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        /* 裁剪模态框 */
+        .crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .crop-modal.show {
+            display: flex;
+        }
+
+        .crop-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .crop-area {
+            position: relative;
+            margin: 20px 0;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .crop-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .crop-controls {
+            margin: 15px 0;
+        }
+
+        .crop-controls label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .crop-controls input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .crop-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .crop-buttons button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crop-buttons .confirm-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .crop-buttons .confirm-btn:hover {
+            background: #059669;
+        }
+
+        .crop-buttons .cancel-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .crop-buttons .cancel-btn:hover {
+            background: #4b5563;
+        }
+
+        /* 自定义背景的海报样式 */
+        .poster.custom-bg {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .poster.custom-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        .poster.custom-bg .poster-content {
+            z-index: 2;
+        }
+
         /* 响应式设计 */
         @media (max-width: 480px) {
             .container {
@@ -619,6 +862,25 @@
                 <label for="eventInput">🎊 活动名称（可选）</label>
                 <input type="text" id="eventInput" placeholder="如：生日聚会、婚礼庆典等" maxlength="30">
             </div>
+
+            <div class="input-group">
+                <label for="customImage">🖼️ 自定义背景图片（可选）</label>
+                <input type="file" id="customImage" accept="image/*" style="display: none;">
+                <div class="image-upload-area" id="imageUploadArea">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">点击上传背景图片</div>
+                        <div class="upload-hint">支持 JPG、PNG 格式</div>
+                    </div>
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImage" src="" alt="预览图片">
+                        <div class="image-controls">
+                            <button type="button" class="crop-btn" onclick="openCropModal()">✂️ 裁剪</button>
+                            <button type="button" class="remove-btn" onclick="removeImage()">🗑️ 删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="template-selector">
                 <label>🎨 选择海报模板</label>
@@ -683,15 +945,14 @@
                 <div class="poster" id="poster">
                     <div class="poster-content">
                         <div class="poster-icon" id="posterIcon">🎊</div>
-                        <div class="poster-title" id="posterTitle">诚挚邀请</div>
-                        <div class="poster-name" id="posterName"></div>
                         <div class="poster-host" id="posterHost"></div>
+                        <div class="poster-name" id="posterName"></div>
                         <div class="poster-subtitle" id="posterSubtitle">
                             参加我们的精彩活动<br>
                             期待与你相遇！
                         </div>
-                        <div class="poster-date" id="posterDate"></div>
                     </div>
+                    <div class="poster-date" id="posterDate"></div>
                 </div>
             </div>
             
@@ -718,48 +979,66 @@
         ✅ 海报已保存到相册！
     </div>
 
+    <!-- 图片裁剪模态框 -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <h3>裁剪图片</h3>
+            <div class="crop-area">
+                <img id="cropImage" class="crop-image" src="" alt="待裁剪图片">
+            </div>
+            <div class="crop-controls">
+                <label>缩放比例:</label>
+                <input type="range" id="scaleRange" min="0.5" max="2" step="0.1" value="1">
+                <label>水平位置:</label>
+                <input type="range" id="posXRange" min="-50" max="50" step="5" value="0">
+                <label>垂直位置:</label>
+                <input type="range" id="posYRange" min="-50" max="50" step="5" value="0">
+            </div>
+            <div class="crop-buttons">
+                <button class="confirm-btn" onclick="applyCrop()">确认裁剪</button>
+                <button class="cancel-btn" onclick="closeCropModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 全局变量
         let currentPosterData = null;
         let selectedTemplate = 1;
+        let customImageData = null;
+        let cropImageData = null;
 
         // 模板配置
         const templates = {
             1: {
                 name: '彩虹梦境',
                 background: 'linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%)',
-                icon: '🎊',
-                title: '诚挚邀请'
+                icon: '🎊'
             },
             2: {
                 name: '星空夜语',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                icon: '⭐',
-                title: '星光邀请'
+                icon: '⭐'
             },
             3: {
                 name: '樱花飞舞',
                 background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                icon: '🌸',
-                title: '浪漫邀约'
+                icon: '🌸'
             },
             4: {
                 name: '海洋之心',
                 background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                icon: '🌊',
-                title: '蔚蓝邀请'
+                icon: '🌊'
             },
             5: {
                 name: '翠绿森林',
                 background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                icon: '🍃',
-                title: '自然邀约'
+                icon: '🍃'
             },
             6: {
                 name: '日出东方',
                 background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                icon: '🌅',
-                title: '晨光邀请'
+                icon: '🌅'
             }
         };
         
@@ -824,6 +1103,7 @@
                     name: name,
                     event: event,
                     template: selectedTemplate,
+                    customImage: customImageData,
                     date: new Date().toLocaleDateString('zh-CN', {
                         year: 'numeric',
                         month: 'long',
@@ -835,8 +1115,8 @@
                 applyTemplate(selectedTemplate);
                 
                 // 更新海报内容
+                document.getElementById('posterHost').textContent = `${host} 邀请`;
                 document.getElementById('posterName').textContent = name;
-                document.getElementById('posterHost').textContent = `— ${host} 邀请`;
                 document.getElementById('posterDate').textContent = `生成于 ${currentPosterData.date}`;
                 
                 // 如果有活动名称，更新副标题
@@ -884,9 +1164,19 @@
             const template = templates[templateId];
             const poster = document.getElementById('poster');
             
-            poster.style.background = template.background;
+            if (customImageData) {
+                // 使用自定义背景
+                poster.style.backgroundImage = `url(${customImageData})`;
+                poster.style.background = '';
+                poster.classList.add('custom-bg');
+            } else {
+                // 使用模板背景
+                poster.style.background = template.background;
+                poster.style.backgroundImage = '';
+                poster.classList.remove('custom-bg');
+            }
+            
             document.getElementById('posterIcon').textContent = template.icon;
-            document.getElementById('posterTitle').textContent = template.title;
         }
         
         // 显示加载状态
@@ -922,6 +1212,9 @@
             document.getElementById('hostInput').value = '';
             document.getElementById('nameInput').value = '';
             document.getElementById('eventInput').value = '';
+            
+            // 重置图片
+            removeImage();
             
             // 清除错误状态
             clearErrors();
