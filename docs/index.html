@@ -31,6 +31,7 @@
             align-items: center;
             padding: 20px;
             position: relative;
+            overflow-x: hidden;
         }
 
         /* 背景动画 */
@@ -244,6 +245,180 @@
         .template-5 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
         .template-6 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 
+        /* 图片上传样式 */
+        .image-upload-area {
+            border: 2px dashed #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            opacity: 0.6;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .image-preview {
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .image-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .crop-btn, .remove-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crop-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .crop-btn:hover {
+            background: #5a67d8;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        /* 裁剪模态框 */
+        .crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .crop-modal.show {
+            display: flex;
+        }
+
+        .crop-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .crop-area {
+            position: relative;
+            margin: 20px 0;
+            background: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .crop-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .crop-controls {
+            margin: 15px 0;
+        }
+
+        .crop-controls label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .crop-controls input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .crop-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .crop-buttons button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crop-buttons .confirm-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .crop-buttons .confirm-btn:hover {
+            background: #059669;
+        }
+
+        .crop-buttons .cancel-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .crop-buttons .cancel-btn:hover {
+            background: #4b5563;
+        }
+
         .generate-btn {
             width: 100%;
             padding: 18px;
@@ -299,7 +474,7 @@
 
         .poster {
             width: 350px;
-            height: 550px;
+            height: 688px;
             border-radius: 20px;
             display: flex;
             flex-direction: column;
@@ -368,32 +543,25 @@
             50% { transform: translateY(-8px); }
         }
 
-        .poster-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .poster-name {
-            font-size: 32px;
-            font-weight: 700;
-            margin: 20px 0;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-            color: #ffffff;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            letter-spacing: 2px;
+        .poster-host {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            color: rgba(255,255,255,0.9);
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
             position: relative;
             z-index: 10;
         }
 
-        .poster-host {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 15px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-            color: rgba(255,255,255,0.9);
-            font-family: 'Georgia', 'Times New Roman', serif;
+        .poster-name {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 10px 0 20px 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            color: #ffffff;
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            letter-spacing: 1px;
             position: relative;
             z-index: 10;
         }
@@ -407,13 +575,32 @@
         }
 
         .poster-date {
-            font-size: 11px;
-            margin-top: 15px;
-            opacity: 0.9;
-            background: rgba(255,255,255,0.2);
-            padding: 6px 12px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            font-size: 10px;
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            opacity: 0.7;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        /* 自定义背景的海报样式 */
+        .poster.custom-bg {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .poster.custom-bg::before {
+            background: rgba(0,0,0,0.4) !important;
+            animation: none !important;
+        }
+
+        .poster.custom-bg::after {
+            display: none;
         }
 
         .action-buttons {
@@ -458,16 +645,6 @@
             background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .action-btn.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border-color: transparent;
-        }
-
-        .action-btn.success:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
         }
 
         .footer {
@@ -530,11 +707,7 @@
             
             .poster {
                 width: 280px;
-                height: 420px;
-            }
-            
-            .poster-title {
-                font-size: 20px;
+                height: 525px;
             }
             
             .poster-name {
@@ -557,37 +730,6 @@
 
             .template-grid {
                 grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        /* 暗色主题适配 */
-        @media (prefers-color-scheme: dark) {
-            .container {
-                background: rgba(30, 30, 30, 0.95);
-                color: white;
-            }
-            
-            .input-section h2 {
-                color: white;
-            }
-            
-            .input-section .subtitle {
-                color: #ccc;
-            }
-            
-            .input-group input {
-                background: #2a2a2a;
-                border-color: #444;
-                color: white;
-            }
-            
-            .input-group label {
-                color: #ccc;
-            }
-            
-            .footer {
-                color: #999;
-                border-top-color: #444;
             }
         }
     </style>
@@ -618,6 +760,25 @@
             <div class="input-group">
                 <label for="eventInput">🎊 活动名称（可选）</label>
                 <input type="text" id="eventInput" placeholder="如：生日聚会、婚礼庆典等" maxlength="30">
+            </div>
+
+            <div class="input-group">
+                <label for="customImage">🖼️ 自定义背景图片（可选）</label>
+                <input type="file" id="customImage" accept="image/*" style="display: none;">
+                <div class="image-upload-area" id="imageUploadArea">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">点击上传背景图片</div>
+                        <div class="upload-hint">支持 JPG、PNG 格式</div>
+                    </div>
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img id="previewImage" src="" alt="预览图片">
+                        <div class="image-controls">
+                            <button type="button" class="crop-btn" onclick="openCropModal()">✂️ 裁剪</button>
+                            <button type="button" class="remove-btn" onclick="removeImage()">🗑️ 删除</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="template-selector">
@@ -683,15 +844,14 @@
                 <div class="poster" id="poster">
                     <div class="poster-content">
                         <div class="poster-icon" id="posterIcon">🎊</div>
-                        <div class="poster-title" id="posterTitle">诚挚邀请</div>
-                        <div class="poster-name" id="posterName"></div>
                         <div class="poster-host" id="posterHost"></div>
+                        <div class="poster-name" id="posterName"></div>
                         <div class="poster-subtitle" id="posterSubtitle">
                             参加我们的精彩活动<br>
                             期待与你相遇！
                         </div>
-                        <div class="poster-date" id="posterDate"></div>
                     </div>
+                    <div class="poster-date" id="posterDate"></div>
                 </div>
             </div>
             
@@ -708,9 +868,6 @@
             </div>
         </div>
 
-        <div class="footer">
-            <p>© 2025 邀请海报生成器 · 让每一次邀请都充满仪式感</p>
-        </div>
     </div>
 
     <!-- 下载成功提示 -->
@@ -718,48 +875,65 @@
         ✅ 海报已保存到相册！
     </div>
 
+    <!-- 图片裁剪模态框 -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <h3>裁剪图片</h3>
+            <div class="crop-area">
+                <img id="cropImage" class="crop-image" src="" alt="待裁剪图片">
+            </div>
+            <div class="crop-controls">
+                <label>缩放比例:</label>
+                <input type="range" id="scaleRange" min="0.5" max="2" step="0.1" value="1">
+                <label>水平位置:</label>
+                <input type="range" id="posXRange" min="-50" max="50" step="5" value="0">
+                <label>垂直位置:</label>
+                <input type="range" id="posYRange" min="-50" max="50" step="5" value="0">
+            </div>
+            <div class="crop-buttons">
+                <button class="confirm-btn" onclick="applyCrop()">确认裁剪</button>
+                <button class="cancel-btn" onclick="closeCropModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 全局变量
         let currentPosterData = null;
         let selectedTemplate = 1;
+        let customImageData = null;
 
         // 模板配置
         const templates = {
             1: {
                 name: '彩虹梦境',
                 background: 'linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%)',
-                icon: '🎊',
-                title: '诚挚邀请'
+                icon: '🎊'
             },
             2: {
                 name: '星空夜语',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                icon: '⭐',
-                title: '星光邀请'
+                icon: '⭐'
             },
             3: {
                 name: '樱花飞舞',
                 background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                icon: '🌸',
-                title: '浪漫邀约'
+                icon: '🌸'
             },
             4: {
                 name: '海洋之心',
                 background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                icon: '🌊',
-                title: '蔚蓝邀请'
+                icon: '🌊'
             },
             5: {
                 name: '翠绿森林',
                 background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                icon: '🍃',
-                title: '自然邀约'
+                icon: '🍃'
             },
             6: {
                 name: '日出东方',
                 background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                icon: '🌅',
-                title: '晨光邀请'
+                icon: '🌅'
             }
         };
         
@@ -824,6 +998,7 @@
                     name: name,
                     event: event,
                     template: selectedTemplate,
+                    customImage: customImageData,
                     date: new Date().toLocaleDateString('zh-CN', {
                         year: 'numeric',
                         month: 'long',
@@ -831,12 +1006,12 @@
                     })
                 };
                 
-                // 应用模板样式
+                // 生成海报时立即应用样式
                 applyTemplate(selectedTemplate);
                 
                 // 更新海报内容
+                document.getElementById('posterHost').textContent = `${host} 邀请`;
                 document.getElementById('posterName').textContent = name;
-                document.getElementById('posterHost').textContent = `— ${host} 邀请`;
                 document.getElementById('posterDate').textContent = `生成于 ${currentPosterData.date}`;
                 
                 // 如果有活动名称，更新副标题
@@ -854,6 +1029,43 @@
             }, 1500);
         }
 
+        // 应用模板样式
+        function applyTemplate(templateId) {
+            const template = templates[templateId];
+            const poster = document.getElementById('poster');
+            
+            console.log('开始应用模板:', templateId, template);
+            
+            // 强制清除所有背景样式
+            poster.style.background = '';
+            poster.style.backgroundImage = '';
+            poster.style.backgroundSize = '';
+            poster.style.backgroundPosition = '';
+            poster.style.backgroundRepeat = '';
+            poster.classList.remove('custom-bg');
+            
+            // 等待一帧后应用新样式
+            requestAnimationFrame(() => {
+                if (customImageData) {
+                    // 使用自定义背景
+                    poster.style.backgroundImage = `url(${customImageData})`;
+                    poster.style.backgroundSize = 'cover';
+                    poster.style.backgroundPosition = 'center';
+                    poster.style.backgroundRepeat = 'no-repeat';
+                    poster.classList.add('custom-bg');
+                    console.log('应用自定义背景');
+                } else {
+                    // 使用模板背景 - 重要修复
+                    poster.style.background = template.background;
+                    poster.classList.remove('custom-bg');
+                    console.log('应用模板背景:', template.background);
+                }
+                
+                // 应用图标
+                document.getElementById('posterIcon').textContent = template.icon;
+            });
+        }
+        
         // 显示错误信息
         function showError(inputId, errorId, message) {
             const input = document.getElementById(inputId);
@@ -878,16 +1090,6 @@
                 error.style.display = 'none';
             });
         }
-
-        // 应用模板样式
-        function applyTemplate(templateId) {
-            const template = templates[templateId];
-            const poster = document.getElementById('poster');
-            
-            poster.style.background = template.background;
-            document.getElementById('posterIcon').textContent = template.icon;
-            document.getElementById('posterTitle').textContent = template.title;
-        }
         
         // 显示加载状态
         function showLoading() {
@@ -902,6 +1104,12 @@
             document.getElementById('loadingSection').style.display = 'none';
             document.getElementById('posterSection').style.display = 'block';
             
+            // 延迟应用样式确保元素已渲染
+            setTimeout(() => {
+                console.log('重新应用模板样式');
+                applyTemplate(selectedTemplate);
+            }, 200);
+            
             // 添加生成动画
             const poster = document.getElementById('poster');
             poster.style.transform = 'scale(0.8) rotateY(180deg)';
@@ -911,7 +1119,7 @@
                 poster.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
                 poster.style.transform = 'scale(1) rotateY(0deg)';
                 poster.style.opacity = '1';
-            }, 100);
+            }, 300);
         }
         
         // 重置表单
@@ -923,11 +1131,21 @@
             document.getElementById('nameInput').value = '';
             document.getElementById('eventInput').value = '';
             
+            // 重置图片
+            removeImage();
+            
             // 清除错误状态
             clearErrors();
             
             // 重置模板选择为第一个
             selectTemplate(1);
+            
+            // 重置海报样式
+            const poster = document.getElementById('poster');
+            poster.classList.remove('custom-bg');
+            poster.style.backgroundImage = '';
+            poster.style.background = '';
+            
             document.getElementById('hostInput').focus();
         }
         
@@ -1022,146 +1240,244 @@
         function trackUsage(name, host, templateId) {
             // 这里可以添加使用统计代码
             console.log(`海报生成成功: ${host} 邀请 ${name} - 模板${templateId} - ${new Date().toISOString()}`);
-            
-            // 示例：发送到统计服务
-            // fetch('/api/track', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ 
-            //         host,
-            //         name, 
-            //         template: templateId,
-            //         timestamp: Date.now() 
-            //     })
-            // });
         }
-        
-        // 事件监听
-        document.getElementById('hostInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('nameInput').focus();
-            }
-        });
 
-        document.getElementById('nameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generatePoster();
-            }
-        });
-        
-        document.getElementById('eventInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generatePoster();
-            }
-        });
-        
-        // 输入验证和错误清除
-        document.getElementById('hostInput').addEventListener('input', function(e) {
-            const value = e.target.value;
-            if (value.length > 20) {
-                e.target.value = value.substring(0, 20);
-            }
-            // 清除错误状态
-            if (value.trim()) {
-                e.target.classList.remove('error');
-                document.getElementById('hostError').style.display = 'none';
-            }
-        });
+        // 图片上传相关功能
+        function initImageUpload() {
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const customImageInput = document.getElementById('customImage');
+            
+            // 点击上传区域
+            imageUploadArea.addEventListener('click', function() {
+                customImageInput.click();
+            });
+            
+            // 文件选择处理
+            customImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        showImagePreview(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
-        document.getElementById('nameInput').addEventListener('input', function(e) {
-            const value = e.target.value;
-            if (value.length > 20) {
-                e.target.value = value.substring(0, 20);
-            }
-            // 清除错误状态
-            if (value.trim()) {
-                e.target.classList.remove('error');
-                document.getElementById('nameError').style.display = 'none';
-            }
-        });
+        // 显示图片预览
+        function showImagePreview(imageUrl) {
+            customImageData = imageUrl;
+            
+            const uploadPlaceholder = document.querySelector('.upload-placeholder');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
+            
+            uploadPlaceholder.style.display = 'none';
+            imagePreview.style.display = 'block';
+            previewImage.src = imageUrl;
+        }
 
-        document.getElementById('eventInput').addEventListener('input', function(e) {
-            const value = e.target.value;
-            if (value.length > 30) {
-                e.target.value = value.substring(0, 30);
+        // 移除图片
+        function removeImage() {
+            customImageData = null;
+            
+            const uploadPlaceholder = document.querySelector('.upload-placeholder');
+            const imagePreview = document.getElementById('imagePreview');
+            const customImageInput = document.getElementById('customImage');
+            
+            uploadPlaceholder.style.display = 'flex';
+            imagePreview.style.display = 'none';
+            customImageInput.value = '';
+        }
+
+        // 打开裁剪模态框
+        function openCropModal() {
+            if (!customImageData) return;
+            
+            const cropModal = document.getElementById('cropModal');
+            const cropImage = document.getElementById('cropImage');
+            
+            cropImage.src = customImageData;
+            cropModal.classList.add('show');
+            
+            // 重置控制器
+            document.getElementById('scaleRange').value = 1;
+            document.getElementById('posXRange').value = 0;
+            document.getElementById('posYRange').value = 0;
+            
+            // 监听控制器变化
+            setupCropControls();
+        }
+
+        // 设置裁剪控制器
+        function setupCropControls() {
+            const scaleRange = document.getElementById('scaleRange');
+            const posXRange = document.getElementById('posXRange');
+            const posYRange = document.getElementById('posYRange');
+            const cropImage = document.getElementById('cropImage');
+            
+            function updateCropImage() {
+                const scale = scaleRange.value;
+                const posX = posXRange.value;
+                const posY = posYRange.value;
+                
+                cropImage.style.transform = `scale(${scale}) translate(${posX}%, ${posY}%)`;
             }
-        });
-        
-        // 模板选择事件
-        document.addEventListener('DOMContentLoaded', function() {
+            
+            scaleRange.addEventListener('input', updateCropImage);
+            posXRange.addEventListener('input', updateCropImage);
+            posYRange.addEventListener('input', updateCropImage);
+        }
+
+        // 应用裁剪
+        function applyCrop() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置画布尺寸为新的海报比例
+            canvas.width = 350;
+            canvas.height = 688;
+            
+            // 创建临时图片对象
+            const img = new Image();
+            img.onload = function() {
+                const scale = document.getElementById('scaleRange').value;
+                const posX = document.getElementById('posXRange').value;
+                const posY = document.getElementById('posYRange').value;
+                
+                // 计算图片绘制参数
+                const imgWidth = img.width * scale;
+                const imgHeight = img.height * scale;
+                const x = (canvas.width - imgWidth) / 2 + (posX * canvas.width / 100);
+                const y = (canvas.height - imgHeight) / 2 + (posY * canvas.height / 100);
+                
+                // 绘制图片到画布
+                ctx.drawImage(img, x, y, imgWidth, imgHeight);
+                
+                // 获取裁剪后的图片数据
+                customImageData = canvas.toDataURL('image/png');
+                
+                // 更新预览
+                document.getElementById('previewImage').src = customImageData;
+                
+                // 关闭模态框
+                closeCropModal();
+                
+                console.log('裁剪完成，新的图片数据:', customImageData.substring(0, 50) + '...');
+            };
+            img.src = customImageData;
+        }
+
+        // 关闭裁剪模态框
+        function closeCropModal() {
+            const cropModal = document.getElementById('cropModal');
+            cropModal.classList.remove('show');
+        }
+
+        // 事件监听初始化
+        function initEventListeners() {
+            // 输入框事件
+            document.getElementById('hostInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('nameInput').focus();
+                }
+            });
+
+            document.getElementById('nameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generatePoster();
+                }
+            });
+            
+            document.getElementById('eventInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generatePoster();
+                }
+            });
+            
+            // 输入验证和错误清除
+            document.getElementById('hostInput').addEventListener('input', function(e) {
+                const value = e.target.value;
+                if (value.length > 20) {
+                    e.target.value = value.substring(0, 20);
+                }
+                if (value.trim()) {
+                    e.target.classList.remove('error');
+                    document.getElementById('hostError').style.display = 'none';
+                }
+            });
+
+            document.getElementById('nameInput').addEventListener('input', function(e) {
+                const value = e.target.value;
+                if (value.length > 20) {
+                    e.target.value = value.substring(0, 20);
+                }
+                if (value.trim()) {
+                    e.target.classList.remove('error');
+                    document.getElementById('nameError').style.display = 'none';
+                }
+            });
+
+            document.getElementById('eventInput').addEventListener('input', function(e) {
+                const value = e.target.value;
+                if (value.length > 30) {
+                    e.target.value = value.substring(0, 30);
+                }
+            });
+            
+            // 模板选择事件
             document.querySelectorAll('.template-option').forEach(option => {
                 option.addEventListener('click', function() {
                     const templateId = parseInt(this.getAttribute('data-template'));
                     selectTemplate(templateId);
                 });
             });
-        });
+
+            // 模态框外部点击关闭
+            document.getElementById('cropModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCropModal();
+                }
+            });
+
+            // 键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // ESC 键重置表单
+                if (e.key === 'Escape') {
+                    const posterSection = document.getElementById('posterSection');
+                    if (posterSection.style.display !== 'none') {
+                        resetForm();
+                    } else if (document.getElementById('cropModal').classList.contains('show')) {
+                        closeCropModal();
+                    }
+                }
+                
+                // 数字键快速选择模板
+                if (e.key >= '1' && e.key <= '6') {
+                    const inputSection = document.getElementById('inputSection');
+                    if (inputSection.style.display !== 'none') {
+                        selectTemplate(parseInt(e.key));
+                    }
+                }
+            });
+        }
         
-        // 页面加载完成
-        window.addEventListener('load', function() {
+        // 页面加载完成初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化事件监听器
+            initEventListeners();
+            
+            // 初始化图片上传功能
+            initImageUpload();
+            
+            // 聚焦第一个输入框
             document.getElementById('hostInput').focus();
             
-            // 预加载资源
-            setTimeout(() => {
-                const poster = document.getElementById('poster');
-                poster.style.transform = 'scale(1)';
-            }, 100);
-        });
-        
-        // 页面可见性变化处理
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                // 页面重新可见时聚焦输入框
-                const inputSection = document.getElementById('inputSection');
-                if (inputSection.style.display !== 'none') {
-                    document.getElementById('hostInput').focus();
-                }
-            }
-        });
-
-        // 键盘快捷键
-        document.addEventListener('keydown', function(e) {
-            // ESC 键重置表单
-            if (e.key === 'Escape') {
-                const posterSection = document.getElementById('posterSection');
-                if (posterSection.style.display !== 'none') {
-                    resetForm();
-                }
-            }
-            
-            // 数字键快速选择模板
-            if (e.key >= '1' && e.key <= '6') {
-                const inputSection = document.getElementById('inputSection');
-                if (inputSection.style.display !== 'none') {
-                    selectTemplate(parseInt(e.key));
-                }
-            }
-        });
-
-        // 检查 html2canvas 库是否加载
-        window.addEventListener('load', function() {
+            // 检查依赖库
             if (typeof html2canvas === 'undefined') {
                 console.warn('html2canvas 库未加载，下载功能可能无法正常工作');
             }
-        });
-
-        // 添加双击海报放大功能
-        document.addEventListener('DOMContentLoaded', function() {
-            const poster = document.getElementById('poster');
-            let isEnlarged = false;
-            
-            poster.addEventListener('dblclick', function() {
-                if (isEnlarged) {
-                    poster.style.transform = 'scale(1)';
-                    poster.style.zIndex = 'auto';
-                    poster.style.position = 'relative';
-                } else {
-                    poster.style.transform = 'scale(1.5)';
-                    poster.style.zIndex = '1000';
-                    poster.style.position = 'relative';
-                }
-                isEnlarged = !isEnlarged;
-            });
         });
     </script>
 </body>
