@@ -12,6 +12,9 @@
     <meta property="og:description" content="扫码生成专属邀请海报，个性化定制你的邀请函">
     <meta property="og:type" content="website">
     
+    <!-- 引入 html2canvas 库用于海报保存 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -124,6 +127,15 @@
             position: relative;
         }
 
+        .input-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
         .input-group input {
             width: 100%;
             padding: 18px 20px;
@@ -142,9 +154,70 @@
             transform: translateY(-2px);
         }
 
-        .input-group input:valid {
-            border-color: #28a745;
+        .template-selector {
+            margin-bottom: 30px;
         }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .template-option {
+            position: relative;
+            border: 3px solid #e1e5e9;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            aspect-ratio: 3/4;
+            background: white;
+        }
+
+        .template-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .template-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .template-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .template-name {
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* 不同模板的样式 */
+        .template-1 { background: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%); }
+        .template-2 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .template-3 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .template-4 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .template-5 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .template-6 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 
         .generate-btn {
             width: 100%;
@@ -193,11 +266,15 @@
             text-align: center;
         }
 
+        .poster-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+
         .poster {
-            width: 100%;
-            max-width: 400px;
-            height: 600px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 30%, #48dbfb 60%, #ff9ff3 100%);
+            width: 300px;
+            height: 450px;
             border-radius: 20px;
             display: flex;
             flex-direction: column;
@@ -208,7 +285,7 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            margin: 0 auto 25px;
+            margin: 0 auto;
         }
 
         .poster::before {
@@ -232,30 +309,31 @@
         .poster-content {
             position: relative;
             z-index: 2;
+            padding: 20px;
         }
 
         .poster-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 36px;
+            margin-bottom: 15px;
             animation: bounce 2s ease-in-out infinite;
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .poster-title {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .poster-name {
-            font-size: 40px;
+            font-size: 28px;
             font-weight: 900;
-            margin: 25px 0;
+            margin: 20px 0;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
             background: linear-gradient(45deg, #ffffff, #f0f0f0);
             -webkit-background-clip: text;
@@ -270,20 +348,20 @@
         }
 
         .poster-subtitle {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 500;
-            margin-top: 20px;
+            margin-top: 15px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             line-height: 1.4;
         }
 
         .poster-date {
-            font-size: 14px;
-            margin-top: 20px;
+            font-size: 11px;
+            margin-top: 15px;
             opacity: 0.9;
             background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 15px;
             backdrop-filter: blur(10px);
         }
 
@@ -309,6 +387,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            border: none;
         }
 
         .action-btn:hover {
@@ -328,6 +407,16 @@
             background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-btn.success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
         }
 
         .footer {
@@ -359,6 +448,24 @@
             100% { transform: rotate(360deg); }
         }
 
+        .download-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .download-success.show {
+            transform: translateX(0);
+        }
+
         /* 响应式设计 */
         @media (max-width: 480px) {
             .container {
@@ -371,19 +478,20 @@
             }
             
             .poster {
-                height: 500px;
+                width: 260px;
+                height: 390px;
             }
             
             .poster-title {
-                font-size: 24px;
+                font-size: 20px;
             }
             
             .poster-name {
-                font-size: 32px;
+                font-size: 24px;
             }
             
             .poster-subtitle {
-                font-size: 16px;
+                font-size: 13px;
             }
             
             .action-buttons {
@@ -394,6 +502,10 @@
             .action-btn {
                 width: 100%;
                 max-width: 200px;
+            }
+
+            .template-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -415,7 +527,11 @@
             .input-group input {
                 background: #2a2a2a;
                 border-color: #444;
-                color: black;
+                color: white;
+            }
+            
+            .input-group label {
+                color: #ccc;
             }
             
             .footer {
@@ -434,10 +550,64 @@
 
         <div class="input-section" id="inputSection">
             <h2>创建你的专属邀请海报</h2>
-            <p class="subtitle">请输入你的姓名，我们将为你生成一张精美的个人邀请海报</p>
+            <p class="subtitle">选择模板，输入信息，生成精美的个人邀请海报</p>
             
             <div class="input-group">
+                <label for="nameInput">👤 你的姓名</label>
                 <input type="text" id="nameInput" placeholder="请输入你的姓名" maxlength="20" required>
+            </div>
+
+            <div class="input-group">
+                <label for="eventInput">🎊 活动名称（可选）</label>
+                <input type="text" id="eventInput" placeholder="如：生日聚会、婚礼庆典等" maxlength="30">
+            </div>
+            
+            <div class="template-selector">
+                <label>🎨 选择海报模板</label>
+                <div class="template-grid">
+                    <div class="template-option selected" data-template="1">
+                        <div class="template-preview template-1">
+                            <div>🎊</div>
+                            <div>彩虹</div>
+                        </div>
+                        <div class="template-name">彩虹梦境</div>
+                    </div>
+                    <div class="template-option" data-template="2">
+                        <div class="template-preview template-2">
+                            <div>⭐</div>
+                            <div>星空</div>
+                        </div>
+                        <div class="template-name">星空夜语</div>
+                    </div>
+                    <div class="template-option" data-template="3">
+                        <div class="template-preview template-3">
+                            <div>🌸</div>
+                            <div>樱花</div>
+                        </div>
+                        <div class="template-name">樱花飞舞</div>
+                    </div>
+                    <div class="template-option" data-template="4">
+                        <div class="template-preview template-4">
+                            <div>🌊</div>
+                            <div>海洋</div>
+                        </div>
+                        <div class="template-name">海洋之心</div>
+                    </div>
+                    <div class="template-option" data-template="5">
+                        <div class="template-preview template-5">
+                            <div>🍃</div>
+                            <div>森林</div>
+                        </div>
+                        <div class="template-name">翠绿森林</div>
+                    </div>
+                    <div class="template-option" data-template="6">
+                        <div class="template-preview template-6">
+                            <div>🌅</div>
+                            <div>日出</div>
+                        </div>
+                        <div class="template-name">日出东方</div>
+                    </div>
+                </div>
             </div>
             
             <button class="generate-btn" onclick="generatePoster()">
@@ -451,22 +621,24 @@
         </div>
 
         <div class="poster-section" id="posterSection">
-            <div class="poster" id="poster">
-                <div class="poster-content">
-                    <div class="poster-icon">🎊</div>
-                    <div class="poster-title">诚挚邀请</div>
-                    <div class="poster-name" id="posterName"></div>
-                    <div class="poster-subtitle">
-                        参加我们的精彩活动<br>
-                        期待与你相遇！
+            <div class="poster-container">
+                <div class="poster" id="poster">
+                    <div class="poster-content">
+                        <div class="poster-icon" id="posterIcon">🎊</div>
+                        <div class="poster-title" id="posterTitle">诚挚邀请</div>
+                        <div class="poster-name" id="posterName"></div>
+                        <div class="poster-subtitle" id="posterSubtitle">
+                            参加我们的精彩活动<br>
+                            期待与你相遇！
+                        </div>
+                        <div class="poster-date" id="posterDate"></div>
                     </div>
-                    <div class="poster-date" id="posterDate"></div>
                 </div>
             </div>
             
             <div class="action-buttons">
                 <button class="action-btn primary" onclick="downloadPoster()">
-                    📱 保存海报
+                    📱 下载海报
                 </button>
                 <button class="action-btn" onclick="sharePoster()">
                     🔗 分享海报
@@ -482,14 +654,73 @@
         </div>
     </div>
 
+    <!-- 下载成功提示 -->
+    <div class="download-success" id="downloadSuccess">
+        ✅ 海报已保存到相册！
+    </div>
+
     <script>
         // 全局变量
         let currentPosterData = null;
+        let selectedTemplate = 1;
+
+        // 模板配置
+        const templates = {
+            1: {
+                name: '彩虹梦境',
+                background: 'linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #48dbfb 100%)',
+                icon: '🎊',
+                title: '诚挚邀请'
+            },
+            2: {
+                name: '星空夜语',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                icon: '⭐',
+                title: '星光邀请'
+            },
+            3: {
+                name: '樱花飞舞',
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                icon: '🌸',
+                title: '浪漫邀约'
+            },
+            4: {
+                name: '海洋之心',
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                icon: '🌊',
+                title: '蔚蓝邀请'
+            },
+            5: {
+                name: '翠绿森林',
+                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                icon: '🍃',
+                title: '自然邀约'
+            },
+            6: {
+                name: '日出东方',
+                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                icon: '🌅',
+                title: '晨光邀请'
+            }
+        };
         
+        // 模板选择
+        function selectTemplate(templateId) {
+            selectedTemplate = templateId;
+            
+            // 更新选中状态
+            document.querySelectorAll('.template-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`[data-template="${templateId}"]`).classList.add('selected');
+        }
+
         // 生成海报
         function generatePoster() {
             const nameInput = document.getElementById('nameInput');
+            const eventInput = document.getElementById('eventInput');
             const name = nameInput.value.trim();
+            const event = eventInput.value.trim();
             
             if (!name) {
                 alert('请输入你的姓名');
@@ -511,6 +742,8 @@
                 // 更新海报数据
                 currentPosterData = {
                     name: name,
+                    event: event,
+                    template: selectedTemplate,
                     date: new Date().toLocaleDateString('zh-CN', {
                         year: 'numeric',
                         month: 'long',
@@ -518,16 +751,36 @@
                     })
                 };
                 
+                // 应用模板样式
+                applyTemplate(selectedTemplate);
+                
                 // 更新海报内容
                 document.getElementById('posterName').textContent = name;
                 document.getElementById('posterDate').textContent = `生成于 ${currentPosterData.date}`;
+                
+                // 如果有活动名称，更新副标题
+                if (event) {
+                    document.getElementById('posterSubtitle').innerHTML = `参加 ${event}<br>期待与你相遇！`;
+                } else {
+                    document.getElementById('posterSubtitle').innerHTML = `参加我们的精彩活动<br>期待与你相遇！`;
+                }
                 
                 // 显示海报
                 showPoster();
                 
                 // 记录使用统计
-                trackUsage(name);
+                trackUsage(name, selectedTemplate);
             }, 1500);
+        }
+
+        // 应用模板样式
+        function applyTemplate(templateId) {
+            const template = templates[templateId];
+            const poster = document.getElementById('poster');
+            
+            poster.style.background = template.background;
+            document.getElementById('posterIcon').textContent = template.icon;
+            document.getElementById('posterTitle').textContent = template.title;
         }
         
         // 显示加载状态
@@ -561,20 +814,73 @@
             document.getElementById('loadingSection').style.display = 'none';
             document.getElementById('posterSection').style.display = 'none';
             document.getElementById('nameInput').value = '';
+            document.getElementById('eventInput').value = '';
+            
+            // 重置模板选择为第一个
+            selectTemplate(1);
             document.getElementById('nameInput').focus();
         }
         
-        // 下载海报
-        function downloadPoster() {
+        // 下载海报（真正的图片下载）
+        async function downloadPoster() {
             if (!currentPosterData) return;
             
-            // 创建提示信息
-            const message = `保存方式：\n\n📱 手机用户：长按海报截图保存\n💻 电脑用户：右键海报选择"另存为图片"\n🖨️ 打印用户：使用浏览器打印功能\n\n海报已生成，快去分享给朋友们吧！`;
+            try {
+                // 显示加载状态
+                const downloadBtn = document.querySelector('.action-btn.primary');
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '🔄 生成中...';
+                downloadBtn.disabled = true;
+                
+                // 获取海报元素
+                const posterElement = document.getElementById('poster');
+                
+                // 使用 html2canvas 生成图片
+                const canvas = await html2canvas(posterElement, {
+                    backgroundColor: null,
+                    scale: 2, // 提高图片质量
+                    useCORS: true,
+                    allowTaint: true,
+                    width: posterElement.offsetWidth,
+                    height: posterElement.offsetHeight
+                });
+                
+                // 转换为图片并下载
+                const link = document.createElement('a');
+                link.download = `${currentPosterData.name}-邀请海报-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                
+                // 触发下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 显示成功提示
+                showDownloadSuccess();
+                
+                // 恢复按钮状态
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败，请稍后重试或使用截图功能');
+                
+                // 恢复按钮状态
+                const downloadBtn = document.querySelector('.action-btn.primary');
+                downloadBtn.innerHTML = '📱 下载海报';
+                downloadBtn.disabled = false;
+            }
+        }
+
+        // 显示下载成功提示
+        function showDownloadSuccess() {
+            const successElement = document.getElementById('downloadSuccess');
+            successElement.classList.add('show');
             
-            alert(message);
-            
-            // 可以在这里添加真实的下载功能
-            // 例如使用 html2canvas 库生成图片
+            setTimeout(() => {
+                successElement.classList.remove('show');
+            }, 3000);
         }
         
         // 分享海报
@@ -582,8 +888,8 @@
             if (!currentPosterData) return;
             
             const shareData = {
-                title: '我的专属邀请海报',
-                text: `${currentPosterData.name}的邀请海报已生成！`,
+                title: `${currentPosterData.name}的专属邀请海报`,
+                text: `我用${templates[currentPosterData.template].name}模板制作了专属邀请海报！`,
                 url: window.location.href
             };
             
@@ -603,20 +909,30 @@
         }
         
         // 使用统计（可选）
-        function trackUsage(name) {
+        function trackUsage(name, templateId) {
             // 这里可以添加使用统计代码
-            console.log(`海报生成成功: ${name} - ${new Date().toISOString()}`);
+            console.log(`海报生成成功: ${name} - 模板${templateId} - ${new Date().toISOString()}`);
             
             // 示例：发送到统计服务
             // fetch('/api/track', {
             //     method: 'POST',
             //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ name, timestamp: Date.now() })
+            //     body: JSON.stringify({ 
+            //         name, 
+            //         template: templateId,
+            //         timestamp: Date.now() 
+            //     })
             // });
         }
         
         // 事件监听
         document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePoster();
+            }
+        });
+        
+        document.getElementById('eventInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 generatePoster();
             }
@@ -628,6 +944,23 @@
             if (value.length > 20) {
                 e.target.value = value.substring(0, 20);
             }
+        });
+
+        document.getElementById('eventInput').addEventListener('input', function(e) {
+            const value = e.target.value;
+            if (value.length > 30) {
+                e.target.value = value.substring(0, 30);
+            }
+        });
+        
+        // 模板选择事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.template-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const templateId = parseInt(this.getAttribute('data-template'));
+                    selectTemplate(templateId);
+                });
+            });
         });
         
         // 页面加载完成
@@ -650,6 +983,51 @@
                     document.getElementById('nameInput').focus();
                 }
             }
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // ESC 键重置表单
+            if (e.key === 'Escape') {
+                const posterSection = document.getElementById('posterSection');
+                if (posterSection.style.display !== 'none') {
+                    resetForm();
+                }
+            }
+            
+            // 数字键快速选择模板
+            if (e.key >= '1' && e.key <= '6') {
+                const inputSection = document.getElementById('inputSection');
+                if (inputSection.style.display !== 'none') {
+                    selectTemplate(parseInt(e.key));
+                }
+            }
+        });
+
+        // 检查 html2canvas 库是否加载
+        window.addEventListener('load', function() {
+            if (typeof html2canvas === 'undefined') {
+                console.warn('html2canvas 库未加载，下载功能可能无法正常工作');
+            }
+        });
+
+        // 添加双击海报放大功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const poster = document.getElementById('poster');
+            let isEnlarged = false;
+            
+            poster.addEventListener('dblclick', function() {
+                if (isEnlarged) {
+                    poster.style.transform = 'scale(1)';
+                    poster.style.zIndex = 'auto';
+                    poster.style.position = 'relative';
+                } else {
+                    poster.style.transform = 'scale(1.5)';
+                    poster.style.zIndex = '1000';
+                    poster.style.position = 'relative';
+                }
+                isEnlarged = !isEnlarged;
+            });
         });
     </script>
 </body>

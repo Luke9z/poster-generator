@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人邀请海报生成器</title>
+    <meta name="description" content="扫码生成专属邀请海报，个性化定制你的邀请函">
+    <meta name="keywords" content="邀请函,海报生成,二维码,个性化">
+    
+    <!-- 社交媒体分享优化 -->
+    <meta property="og:title" content="个人邀请海报生成器">
+    <meta property="og:description" content="扫码生成专属邀请海报，个性化定制你的邀请函">
+    <meta property="og:type" content="website">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 背景动画 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 32px 64px rgba(0,0,0,0.15);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: sparkle 6s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-section {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .input-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .input-section .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #f8f9fa;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-group input:valid {
+            border-color: #28a745;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .generate-btn:hover::before {
+            left: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .poster-section {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .poster {
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 30%, #48dbfb 60%, #ff9ff3 100%);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            margin: 0 auto 25px;
+        }
+
+        .poster::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 50%);
+            animation: shimmer 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        .poster-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .poster-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .poster-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .poster-name {
+            font-size: 35px;
+            font-weight: 900;
+            margin: 25px 0;
+            /* text-shadow: 3px 3px 3px rgba(0,0,0,0.4); */
+            background: linear-gradient(45deg, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* animation: glow 2s ease-in-out infinite alternate; */
+        }
+
+        /* @keyframes glow {
+            0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            100% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
+        } */
+
+        .poster-subtitle {
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            line-height: 1.4;
+        }
+
+        .poster-date {
+            font-size: 14px;
+            margin-top: 20px;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            padding: 14px 28px;
+            border: 2px solid #667eea;
+            border-radius: 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 20px;
+            }
+            
+            .input-section {
+                padding: 30px 20px;
+            }
+            
+            .poster {
+                height: 500px;
+            }
+            
+            .poster-title {
+                font-size: 24px;
+            }
+            
+            .poster-name {
+                font-size: 32px;
+            }
+            
+            .poster-subtitle {
+                font-size: 16px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+
+        /* 暗色主题适配 */
+        @media (prefers-color-scheme: dark) {
+            .container {
+                background: rgba(30, 30, 30, 0.95);
+                color: white;
+            }
+            
+            .input-section h2 {
+                color: white;
+            }
+            
+            .input-section .subtitle {
+                color: #ccc;
+            }
+            
+            .input-group input {
+                background: #2a2a2a;
+                border-color: #444;
+                color: black;
+            }
+            
+            .footer {
+                color: #999;
+                border-top-color: #444;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 邀请海报生成器</h1>
+            <p>专属定制 · 即刻生成</p>
+        </div>
+
+        <div class="input-section" id="inputSection">
+            <h2>创建你的专属邀请海报</h2>
+            <p class="subtitle">请输入你的姓名，我们将为你生成一张精美的个人邀请海报</p>
+            
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="请输入你的姓名" maxlength="20" required>
+            </div>
+            
+            <button class="generate-btn" onclick="generatePoster()">
+                <span>生成我的专属海报</span>
+            </button>
+        </div>
+
+        <div class="loading" id="loadingSection">
+            <div class="loading-spinner"></div>
+            <p>正在生成你的专属海报...</p>
+        </div>
+
+        <div class="poster-section" id="posterSection">
+            <div class="poster" id="poster">
+                <div class="poster-content">
+                    <div class="poster-icon">🎊</div>
+                    <div class="poster-title">诚挚邀请</div>
+                    <div class="poster-name" id="posterName"></div>
+                    <div class="poster-subtitle">
+                        参加我们的精彩活动<br>
+                        期待与你相遇！
+                    </div>
+                    <div class="poster-date" id="posterDate"></div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="downloadPoster()">
+                    📱 保存海报
+                </button>
+                <button class="action-btn" onclick="sharePoster()">
+                    🔗 分享海报
+                </button>
+                <button class="action-btn" onclick="resetForm()">
+                    🔄 重新制作
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 邀请海报生成器 · 让每一次邀请都充满仪式感</p>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentPosterData = null;
+        
+        // 生成海报
+        function generatePoster() {
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('请输入你的姓名');
+                nameInput.focus();
+                return;
+            }
+            
+            if (name.length > 20) {
+                alert('姓名长度不能超过20个字符');
+                nameInput.focus();
+                return;
+            }
+            
+            // 显示加载状态
+            showLoading();
+            
+            // 模拟加载过程
+            setTimeout(() => {
+                // 更新海报数据
+                currentPosterData = {
+                    name: name,
+                    date: new Date().toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })
+                };
+                
+                // 更新海报内容
+                document.getElementById('posterName').textContent = name;
+                document.getElementById('posterDate').textContent = `生成于 ${currentPosterData.date}`;
+                
+                // 显示海报
+                showPoster();
+                
+                // 记录使用统计
+                trackUsage(name);
+            }, 1500);
+        }
+        
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('posterSection').style.display = 'none';
+        }
+        
+        // 显示海报
+        function showPoster() {
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('posterSection').style.display = 'block';
+            
+            // 添加生成动画
+            const poster = document.getElementById('poster');
+            poster.style.transform = 'scale(0.8) rotateY(180deg)';
+            poster.style.opacity = '0';
+            
+            setTimeout(() => {
+                poster.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                poster.style.transform = 'scale(1) rotateY(0deg)';
+                poster.style.opacity = '1';
+            }, 100);
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('posterSection').style.display = 'none';
+            document.getElementById('nameInput').value = '';
+            document.getElementById('nameInput').focus();
+        }
+        
+        // 下载海报
+        function downloadPoster() {
+            if (!currentPosterData) return;
+            
+            // 创建提示信息
+            const message = `保存方式：\n\n📱 手机用户：长按海报截图保存\n💻 电脑用户：右键海报选择"另存为图片"\n🖨️ 打印用户：使用浏览器打印功能\n\n海报已生成，快去分享给朋友们吧！`;
+            
+            alert(message);
+            
+            // 可以在这里添加真实的下载功能
+            // 例如使用 html2canvas 库生成图片
+        }
+        
+        // 分享海报
+        function sharePoster() {
+            if (!currentPosterData) return;
+            
+            const shareData = {
+                title: '我的专属邀请海报',
+                text: `${currentPosterData.name}的邀请海报已生成！`,
+                url: window.location.href
+            };
+            
+            if (navigator.share) {
+                navigator.share(shareData);
+            } else {
+                // 降级处理：复制链接
+                const url = window.location.href;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('链接已复制到剪贴板，快去分享给朋友们吧！');
+                    });
+                } else {
+                    alert(`请复制以下链接分享：\n${url}`);
+                }
+            }
+        }
+        
+        // 使用统计（可选）
+        function trackUsage(name) {
+            // 这里可以添加使用统计代码
+            console.log(`海报生成成功: ${name} - ${new Date().toISOString()}`);
+            
+            // 示例：发送到统计服务
+            // fetch('/api/track', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ name, timestamp: Date.now() })
+            // });
+        }
+        
+        // 事件监听
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generatePoster();
+            }
+        });
+        
+        // 输入验证
+        document.getElementById('nameInput').addEventListener('input', function(e) {
+            const value = e.target.value;
+            if (value.length > 20) {
+                e.target.value = value.substring(0, 20);
+            }
+        });
+        
+        // 页面加载完成
+        window.addEventListener('load', function() {
+            document.getElementById('nameInput').focus();
+            
+            // 预加载资源
+            setTimeout(() => {
+                const poster = document.getElementById('poster');
+                poster.style.transform = 'scale(1)';
+            }, 100);
+        });
+        
+        // 页面可见性变化处理
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // 页面重新可见时聚焦输入框
+                const inputSection = document.getElementById('inputSection');
+                if (inputSection.style.display !== 'none') {
+                    document.getElementById('nameInput').focus();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
